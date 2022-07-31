@@ -3,46 +3,59 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import AppShell from './Components/AppShell/AppShell.tsx';
 import WorkoutsPage from './Pages/Workouts/WorkoutsPage.tsx';
+import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 
 function App() {
+
+  const apolloClient = 
+    new ApolloClient
+    (
+      {
+        uri: "",
+        cache: new InMemoryCache(),
+      }
+    );
+
   return (
-    <div className="App">
-      <Router>
-        <Routes>
-          <Route 
-            path="/profile" 
-            element=
-            {
-              <AppShell pageTitle="Profile" pageIndex={0}>
-                <WorkoutsPage />
-              </AppShell>
-            } 
-          />
-          <Route 
-            path="/workouts" 
-            element=
-            {
-              <AppShell pageTitle="Workouts" pageIndex={1}>
-                <WorkoutsPage />
-              </AppShell>
-            } 
-          />
-          <Route 
-            path="/weigh-in" 
-            element=
-            {
-              <AppShell pageTitle="Weigh-In" pageIndex={2}>
-                <WorkoutsPage />
-              </AppShell>
-            } 
-          />
-          <Route
-            path="*"
-            element={<Navigate to="/profile" replace />}
-          />
-        </Routes>
-      </Router>
-    </div>
+    <ApolloProvider client={apolloClient}>
+      <div className="App">
+        <Router>
+          <Routes>
+            <Route 
+              path="/profile" 
+              element=
+              {
+                <AppShell pageTitle="Profile" pageIndex={0}>
+                  <WorkoutsPage />
+                </AppShell>
+              } 
+            />
+            <Route 
+              path="/workouts" 
+              element=
+              {
+                <AppShell pageTitle="Workouts" pageIndex={1}>
+                  <WorkoutsPage />
+                </AppShell>
+              } 
+            />
+            <Route 
+              path="/weigh-in" 
+              element=
+              {
+                <AppShell pageTitle="Weigh-In" pageIndex={2}>
+                  <WorkoutsPage />
+                </AppShell>
+              } 
+            />
+            <Route
+              path="*"
+              element={<Navigate to="/profile" replace />}
+            />
+          </Routes>
+        </Router>
+      </div>
+    </ApolloProvider>
   );
 }
 
