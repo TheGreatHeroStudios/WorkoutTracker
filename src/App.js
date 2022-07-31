@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import AppShell from './Components/AppShell/AppShell.tsx';
 import WorkoutsPage from './Pages/Workouts/WorkoutsPage.tsx';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
+import AddExercisePage from './Pages/Exercises/AddExercisePage';
 
 function App() {
 
@@ -40,10 +41,19 @@ function App() {
               } 
             />
             <Route 
+              path="/exercises" 
+              element=
+              {
+                <AppShell pageTitle="Exercises" pageIndex={2}>
+                  <AddExercisePage />
+                </AppShell>
+              } 
+            />
+            <Route 
               path="/weigh-in" 
               element=
               {
-                <AppShell pageTitle="Weigh-In" pageIndex={2}>
+                <AppShell pageTitle="Weigh-In" pageIndex={3}>
                   <WorkoutsPage />
                 </AppShell>
               } 

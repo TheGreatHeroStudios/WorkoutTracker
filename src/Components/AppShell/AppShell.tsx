@@ -1,7 +1,7 @@
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import React, { ReactNode } from "react";
 import Box from "@mui/material/Box";
-import { AssignmentInd, FitnessCenter, MonitorWeight } from "@mui/icons-material";
+import { Assignment, FitnessCenter, MonitorWeight, Person } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -55,6 +55,11 @@ const AppShell = (props) =>
                             }
                             case 2:
                             {
+                                navigate("../exercises");
+                                break;
+                            }
+                            case 3:
+                            {
                                 navigate("../weigh-in");
                                 break;
                             }
@@ -83,11 +88,19 @@ const AppShell = (props) =>
                     sx={{fontWeight: "bold"}}
                     icon=
                     {
-                        <AssignmentInd sx={{fontSize: 50}}/>
+                        <Person sx={{fontSize: 50}}/>
                     }
                 />
                 <BottomNavigationAction 
                     label="Workouts"
+                    sx={{fontWeight: "bold"}}
+                    icon=
+                    {
+                        <Assignment sx={{fontSize: 50}}/>
+                    }
+                />
+                <BottomNavigationAction 
+                    label="Exercises"
                     sx={{fontWeight: "bold"}}
                     icon=
                     {
