@@ -5,6 +5,7 @@ import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import AppShell from './Layout/AppShell.tsx';
 import WorkoutsPage from './Pages/Workouts/WorkoutsPage.tsx';
 import ExercisesPage from './Pages/Exercises/ExercisesPage.tsx';
+import EditExercisePage from './Pages/Exercises/EditExercisePage.tsx';
 
 function App() {
 
@@ -51,8 +52,26 @@ function App() {
                 <AppShell pageTitle="Exercises" pageIndex={2}>
                   <ExercisesPage />
                 </AppShell>
-              } 
-            />
+              } >
+                <Route 
+                  path="add"
+                  element=
+                  {
+                    <AppShell pageTitle="Add Exercise" pageIndex={2}>
+                      <EditExercisePage />
+                    </AppShell>
+                  }
+                />
+                <Route 
+                  path="edit/:exerciseId"
+                  element=
+                  {
+                    <AppShell pageTitle="Edit Exercise" pageIndex={2}>
+                      <EditExercisePage />
+                    </AppShell>
+                  }
+                />
+            </Route>
             <Route 
               path="/weigh-in" 
               element=

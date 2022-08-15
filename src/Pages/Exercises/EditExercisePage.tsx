@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import React from "react";
 import { GET_MUSCLE_GROUPS } from "../../DataModel/MuscleGroups";
 
-const AddExercisePage = () =>
+const EditExercisePage = () =>
 {
     const { loading, error, data } = useQuery(GET_MUSCLE_GROUPS);
 
@@ -12,4 +12,4 @@ const AddExercisePage = () =>
     );
 }
 
-export default AddExercisePage;
+export default EditExercisePage;

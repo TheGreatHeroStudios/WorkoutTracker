@@ -1,6 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { stringifyForDisplay } from "@apollo/client/utilities";
-import { Box, Container } from "@mui/material";
+import { Container } from "@mui/material";
 import React from "react";
 import ExerciseCard from "../../Components/Exercises/ExerciseCard";
 import { GET_EXERCISES, ConvertQueryResults } from "../../DataModel/Exercises";
@@ -8,7 +7,7 @@ import { GET_EXERCISES, ConvertQueryResults } from "../../DataModel/Exercises";
 const ExercisesPage = () =>
 {
     const { loading, error, data } = useQuery(GET_EXERCISES);
-    const testData: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    //const testData: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     return (
         loading ?
@@ -22,14 +21,13 @@ const ExercisesPage = () =>
                     overflowY: "scroll"
                 }} >
                 {
-                    //ConvertQueryResults(data)
-                    testData
+                    ConvertQueryResults(data)
                         .map
                         (
                             ex =>
                             (
                                 <ExerciseCard 
-                                    exercise={null}
+                                    exercise={ex}
                                     sx=
                                     {{
                                         maxWidth: "90vw",
