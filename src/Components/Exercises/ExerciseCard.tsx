@@ -1,5 +1,5 @@
-import { FitnessCenter } from "@mui/icons-material";
-import { Box, CardContent, CardMedia, SxProps, Theme } from "@mui/material";
+import { Delete, Edit, FitnessCenter } from "@mui/icons-material";
+import { Box, CardContent, CardMedia, SxProps, Theme, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import React from "react";
 import { Exercise } from "../../DataModel/Exercises";
@@ -46,24 +46,40 @@ const ExerciseCard = (props: ExerciseCardProps) =>
 
 
     return (
-        <Card sx={{display: "flex", ...props.sx}}>
+        <Card sx=
+            {{
+                display: "flex", 
+                flexDirection: "row",
+                ...props.sx
+            }} >
             <FitnessCenter 
                 sx=
                 {{
                     alignSelf: "center", 
                     marginLeft: "10px", 
-                    fontSize: "80px",
-                    color: "#CCCCCC"
+                    fontSize: "60px",
+                    color: "#CCCCCC",
+                    width: "20vw"
                 }} />
             <CardContent 
                 sx=
                 {{
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "column",
+                    width: "60vw",
+                    justifyContent: "left"
                 }} >
-                    <h2>
-                        {props.exercise?.name ?? "Exercise"}
-                    </h2>
+                <Typography 
+                    component="div" 
+                    variant="subtitle1"
+                    sx=
+                    {{
+                        alignSelf: "start", 
+                        fontWeight: "bold",
+                        //marginBottom: "1vh"
+                    }}>
+                    {props.exercise?.name ?? "Exercise"}
+                </Typography>
                 <Box sx={{display: "flex", flexDirection: "row"}}>
                     {
                         GetMuscleGroupIconPaths()
@@ -76,13 +92,24 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                                         image={iconPath} 
                                         sx=
                                         {{
-                                            maxWidth: "8vw"
+                                            maxWidth: "10vw"
                                         }}/>
                                 )
                             )
                     }
                 </Box>
             </CardContent>
+            <Box 
+                sx=
+                {{
+                    display: "flex", 
+                    flexDirection: "column",
+                    width: "10vw",
+                    justifyItems: "center"
+                }} >
+                <Edit sx={{fontSize: 25, marginTop: "2vh", marginRight: "3vw"}}/>
+                <Delete sx={{fontSize: 25, marginTop: "2vh", marginRight: "3vw"}}/>
+            </Box>
         </Card>
     )
 }

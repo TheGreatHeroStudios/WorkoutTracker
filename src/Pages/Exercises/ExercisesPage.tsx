@@ -27,6 +27,7 @@ const ExercisesPage = () =>
                                     sx=
                                     {{
                                         maxWidth: "90vw",
+                                        maxHeight: "15vh",
                                         marginTop: "20px"
                                     }} />
                             )
