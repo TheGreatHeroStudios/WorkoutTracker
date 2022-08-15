@@ -1,10 +1,10 @@
 import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
-import AppShell from './Components/AppShell/AppShell.tsx';
-import WorkoutsPage from './Pages/Workouts/WorkoutsPage.tsx';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
-import AddExercisePage from './Pages/Exercises/AddExercisePage';
+import AppShell from './Layout/AppShell.tsx';
+import WorkoutsPage from './Pages/Workouts/WorkoutsPage.tsx';
+import ExercisesPage from './Pages/Exercises/ExercisesPage.tsx';
 
 function App() {
 
@@ -12,7 +12,11 @@ function App() {
     new ApolloClient
     (
       {
-        uri: "",
+        uri: "https://tgh-workout-tracker.hasura.app/v1/graphql",
+        headers:
+        {
+          "x-hasura-admin-secret": "D6xzOMKVqwe6RbBXCNhw4XXD6kNOPeziq0pDqbtdxlxLQ8RT7rGbBLSe0CNVzsmw"
+        },
         cache: new InMemoryCache(),
       }
     );
@@ -45,7 +49,7 @@ function App() {
               element=
               {
                 <AppShell pageTitle="Exercises" pageIndex={2}>
-                  <AddExercisePage />
+                  <ExercisesPage />
                 </AppShell>
               } 
             />

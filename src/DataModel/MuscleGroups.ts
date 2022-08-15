@@ -4,6 +4,7 @@ export interface Muscle
 {
     anatomicalName: string;
     simpleName: string;
+    muscleGroupName: string;
 }
 
 export interface MuscleGroup
@@ -13,7 +14,7 @@ export interface MuscleGroup
 }
 
 export const GET_MUSCLE_GROUPS = gql `
-    query MuscleGroups 
+    query GetMuscleGroups 
     {
         c_muscle_group 
         {
