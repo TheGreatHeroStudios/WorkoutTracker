@@ -75,8 +75,7 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                     sx=
                     {{
                         alignSelf: "start", 
-                        fontWeight: "bold",
-                        //marginBottom: "1vh"
+                        fontWeight: "bold"
                     }}>
                     {props.exercise?.name ?? "Exercise"}
                 </Typography>
@@ -107,8 +106,7 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                     width: "10vw",
                     justifyItems: "center"
                 }} >
-                <Edit sx={{fontSize: 25, marginTop: "2vh", marginRight: "3vw"}}/>
-                <Delete sx={{fontSize: 25, marginTop: "2vh", marginRight: "3vw"}}/>
+                <Edit sx={{fontSize: 25, marginTop: "2vh", marginRight: "2vw"}}/>
             </Box>
         </Card>
     )

@@ -28,8 +28,7 @@ const AppShell = (props) =>
                     display: "flex", 
                     justifyContent: "center", 
                     color: "white"
-                }}
-            >
+                }} >
                 <h2>{props.pageTitle}</h2>
             </Box>
             <Box width="100vw" height="80vh" sx={{display: "flex"}}>
@@ -82,7 +81,7 @@ const AppShell = (props) =>
                     }
                   
                 }}
-                showLabels>
+                showLabels >
                 <BottomNavigationAction 
                     label="Profile"
                     sx={{fontWeight: "bold"}}

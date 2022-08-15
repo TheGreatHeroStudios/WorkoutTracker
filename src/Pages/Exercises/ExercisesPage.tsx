@@ -8,26 +8,32 @@ import { GET_EXERCISES, ConvertQueryResults } from "../../DataModel/Exercises";
 const ExercisesPage = () =>
 {
     const { loading, error, data } = useQuery(GET_EXERCISES);
-    //const test: number[] = [1, 2, 3];
+    const testData: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     return (
         loading ?
             <h1>Loading...</h1> :
         error ?    
             <h1>Error loading exercise data: {error.message}</h1> :
-            <Container>
+            <Container 
+                sx=
+                {{
+                    height: "78vh",
+                    overflowY: "scroll"
+                }} >
                 {
-                    ConvertQueryResults(data)
+                    //ConvertQueryResults(data)
+                    testData
                         .map
                         (
                             ex =>
                             (
                                 <ExerciseCard 
-                                    exercise={ex}
+                                    exercise={null}
                                     sx=
                                     {{
                                         maxWidth: "90vw",
-                                        maxHeight: "15vh",
+                                        height: "12vh",
                                         marginTop: "20px"
                                     }} />
                             )
