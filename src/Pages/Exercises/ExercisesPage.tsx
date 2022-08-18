@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { Container } from "@mui/material";
 import React from "react";
 import ExerciseCard from "../../Components/Exercises/ExerciseCard";
-import { GET_EXERCISES, ConvertQueryResults } from "../../DataModel/Exercises";
+import { GET_EXERCISES, ConvertQueryResultsToExercises } from "../../DataModel/Exercises";
 
 const ExercisesPage = () =>
 {
@@ -21,7 +21,7 @@ const ExercisesPage = () =>
                     overflowY: "scroll"
                 }} >
                 {
-                    ConvertQueryResults(data)
+                    ConvertQueryResultsToExercises(data)
                         .map
                         (
                             ex =>

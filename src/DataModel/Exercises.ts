@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { Muscle } from "./MuscleGroups";
+import { Muscle } from "./Muscles";
 
 export interface Exercise
 {
+    id: number;
     name: string;
     muscles: Muscle[];
 }
@@ -12,6 +13,7 @@ export const GET_EXERCISES = gql `
     {
         exercise 
         {
+            exercise_id
             exercise_name
             exercise_muscles 
             {
@@ -29,7 +31,30 @@ export const GET_EXERCISES = gql `
     }  
 `
 
-export const ConvertQueryResults: (results: any) => Exercise[] =
+export const GET_EXERCISE_BY_ID = gql `
+    query GetExerciseById($exerciseId: Int) 
+    {
+        exercise(where: {exercise_id: {_eq: $exerciseId}}) 
+        {
+            exercise_id
+            exercise_name
+            exercise_muscles 
+            {
+                muscle 
+                {
+                    muscle_short_desc
+                    muscle_long_desc
+                    muscle_group 
+                    {
+                        muscle_group_desc
+                    }
+                }
+            }
+        }
+    }
+`
+
+export const ConvertQueryResultsToExercises: (results: any) => Exercise[] =
     (results) =>
         results
             .exercise
@@ -38,6 +63,7 @@ export const ConvertQueryResults: (results: any) => Exercise[] =
                 ex =>
                 (
                     {
+                        id: ex.exercise_id,
                         name: ex.exercise_name,
                         muscles: 
                             ex

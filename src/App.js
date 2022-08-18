@@ -46,6 +46,24 @@ function App() {
               } 
             />
             <Route 
+              path="/exercises/add"
+              element=
+              {
+                <AppShell pageTitle="Add Exercise" pageIndex={2}>
+                  <EditExercisePage />
+                </AppShell>
+              }
+            />
+            <Route 
+              path="/exercises/edit/:exerciseId"
+              element=
+              {
+                <AppShell pageTitle="Edit Exercise" pageIndex={2}>
+                  <EditExercisePage />
+                </AppShell>
+              }
+            />
+            <Route 
               path="/exercises" 
               element=
               {
@@ -53,24 +71,6 @@ function App() {
                   <ExercisesPage />
                 </AppShell>
               } >
-                <Route 
-                  path="add"
-                  element=
-                  {
-                    <AppShell pageTitle="Add Exercise" pageIndex={2}>
-                      <EditExercisePage />
-                    </AppShell>
-                  }
-                />
-                <Route 
-                  path="edit/:exerciseId"
-                  element=
-                  {
-                    <AppShell pageTitle="Edit Exercise" pageIndex={2}>
-                      <EditExercisePage />
-                    </AppShell>
-                  }
-                />
             </Route>
             <Route 
               path="/weigh-in" 

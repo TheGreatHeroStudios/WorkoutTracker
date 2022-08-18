@@ -1,7 +1,8 @@
 import { Delete, Edit, FitnessCenter } from "@mui/icons-material";
-import { Box, CardContent, CardMedia, SxProps, Theme, Typography } from "@mui/material";
+import { Box, CardContent, CardMedia, IconButton, SxProps, Theme, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Exercise } from "../../DataModel/Exercises";
 
 
@@ -14,6 +15,8 @@ export interface ExerciseCardProps
 
 const ExerciseCard = (props: ExerciseCardProps) =>
 {
+    const navigate = useNavigate();
+
     const GetMuscleGroupIconPaths = () =>
     {
         return (
@@ -106,7 +109,9 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                     width: "10vw",
                     justifyItems: "center"
                 }} >
-                <Edit sx={{fontSize: 25, marginTop: "2vh", marginRight: "2vw"}}/>
+                <IconButton onClick={() => navigate(props.exercise == null ? "./add" : `./edit/${props.exercise?.id}`)}>
+                    <Edit sx={{fontSize: 25, marginTop: "2vh", marginRight: "2vw"}}/>
+                </IconButton>
             </Box>
         </Card>
     )
