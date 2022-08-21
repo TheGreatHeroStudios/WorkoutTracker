@@ -1,47 +1,73 @@
 import { useQuery } from "@apollo/client";
 import { TextField } from "@mui/material";
-import React, { useState } from "react";
-import { ConvertQueryResultsToExercises, Exercise, GET_EXERCISE_BY_ID } from "../../DataModel/Exercises";
+import React, { useState, useReducer } from "react";
+import { useParams } from "react-router-dom";
+import { ConvertQueryResultsToExercises, Exercise, GET_EXERCISE_BY_ID, InitExercise } from "../../DataModel/Exercises";
 import { GET_MUSCLES } from "../../DataModel/Muscles";
+import UpdateObject from "../../Utility/UpdateObject";
 
-interface EditExerciseProps
+const EditExercisePage = () =>
 {
-    exerciseId?: number
-}
+    const { exerciseId } = useParams();
 
-const EditExercisePage = (props: EditExerciseProps) =>
-{
-    const [exerciseInContext, setExerciseInContext] = useState<Exercise>();
+    const [exerciseInContext, updateExerciseInContext] = 
+        useReducer(UpdateObject<Exercise>, InitExercise());
 
     useQuery(GET_MUSCLES);
 
-    useQuery
-    (
-        GET_EXERCISE_BY_ID,
-        {
-            variables: props.exerciseId ?? -1,
-            onCompleted: 
-                (queryResults) =>
+    const { data, loading } =
+        useQuery
+        (
+            GET_EXERCISE_BY_ID,
+            {
+                variables: 
                 {
-                    const exercise = 
-                        ConvertQueryResultsToExercises(queryResults);
-
-                    if(exercise.length > 0)
+                    exerciseId: exerciseId ?? -1,
+                },
+                onCompleted: 
+                    (queryResults) =>
                     {
-                        setExerciseInContext(exercise[0]);
+                        const exercise = 
+                            ConvertQueryResultsToExercises(queryResults);
+
+                        if(exercise.length > 0)
+                        {
+                            updateExerciseInContext
+                            (
+                                {
+                                    propertyValue: exercise[0]
+                                }
+                            );
+                        }
+                    },
+                onError:
+                    (error) =>
+                    {
+                        console.log(error.message);
                     }
-                }
-        }
-    );
+            }
+        );
 
     return (
         <div>
             <TextField
                 required
-                id="filled-required"
+                id="outlined-required"
                 label="Exercise Name"
-                defaultValue={exerciseInContext?.name}
-                variant="filled" />
+                defaultValue={exerciseInContext?.name ?? "New Exercise"}
+                onChange=
+                {
+                    (e) => 
+                    {
+                        updateExerciseInContext
+                        (
+                            {
+                                propertyName: "name",
+                                propertyValue: e.target.value
+                            }
+                        )
+                    }
+                } />
         </div>
     );
 }

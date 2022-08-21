@@ -82,3 +82,13 @@ export const ConvertQueryResultsToExercises: (results: any) => Exercise[] =
                     }
                 )
             );
+
+export const InitExercise: () => Exercise =
+() => 
+(
+    {
+        id: -1,
+        name: "Exercise",
+        muscles: []
+    }
+);
