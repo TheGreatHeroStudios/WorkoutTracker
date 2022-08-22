@@ -1,4 +1,4 @@
-import { Delete, Edit, FitnessCenter } from "@mui/icons-material";
+import { Edit, PhotoCamera } from "@mui/icons-material";
 import { Box, CardContent, CardMedia, IconButton, SxProps, Theme, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import React from "react";
@@ -55,7 +55,7 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                 flexDirection: "row",
                 ...props.sx
             }} >
-            <FitnessCenter 
+            <PhotoCamera 
                 sx=
                 {{
                     alignSelf: "center", 
