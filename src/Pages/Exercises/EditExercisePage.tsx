@@ -1,20 +1,52 @@
 import { useQuery } from "@apollo/client";
 import { AddAPhoto } from "@mui/icons-material";
 import { TextField } from "@mui/material";
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ConvertQueryResultsToExercises, Exercise, GET_EXERCISE_BY_ID, InitExercise } from "../../DataModel/Exercises";
-import { GET_MUSCLES } from "../../DataModel/Muscles";
+import { ConvertQueryResultsToMuscles, GET_MUSCLES, Muscle } from "../../DataModel/Muscles";
 import UpdateObject from "../../Utility/UpdateObject";
 
 const EditExercisePage = () =>
 {
     const { exerciseId } = useParams();
 
-    const [exerciseInContext, updateExerciseInContext] = 
-        useReducer(UpdateObject<Exercise>, InitExercise());
+    const [muscleList, setMuscleList] = useState<Muscle[]>([]);
+    const [exerciseName, setExerciseName] = useState("Exercise");
 
-    useQuery(GET_MUSCLES);
+    const setExerciseInContext = (exerciseData: any) =>
+    {
+        const exercises = 
+            ConvertQueryResultsToExercises(exerciseData);
+
+        if(exercises !== null && exercises !== undefined && exercises.length > 0)
+        {
+            setExerciseName(exercises[0].name);
+        }
+    }
+
+    useQuery
+    (
+        GET_MUSCLES,
+        {
+            onCompleted:
+                (queryResults) =>
+                {
+                    const muscles =
+                        ConvertQueryResultsToMuscles(queryResults);
+
+                    if(muscles.length > 0)
+                    {
+                        setMuscleList(muscles);
+                    }
+                },
+            onError:
+                (error) =>
+                {
+                    console.log(error.message);
+                }
+        }
+    );
 
     useQuery
     (
@@ -24,22 +56,8 @@ const EditExercisePage = () =>
             {
                 exerciseId: exerciseId ?? -1,
             },
-            onCompleted: 
-                (queryResults) =>
-                {
-                    const exercise = 
-                        ConvertQueryResultsToExercises(queryResults);
-
-                    if(exercise.length > 0)
-                    {
-                        updateExerciseInContext
-                        (
-                            {
-                                propertyValue: exercise[0]
-                            }
-                        );
-                    }
-                },
+            onCompleted:
+                (queryResults) => setExerciseInContext(queryResults),
             onError:
                 (error) =>
                 {
@@ -62,19 +80,10 @@ const EditExercisePage = () =>
                     required
                     id="outlined-required"
                     label="Exercise Name"
-                    defaultValue={exerciseInContext?.name ?? "New Exercise"}
+                    value={exerciseName ?? "New Exercise"}
                     onChange=
                     {
-                        (e) => 
-                        {
-                            updateExerciseInContext
-                            (
-                                {
-                                    propertyName: "name",
-                                    propertyValue: e.target.value
-                                }
-                            )
-                        }
+                        (e) => setExerciseName(e.target.value)
                     } />
                 <AddAPhoto
                     sx=
@@ -88,15 +97,23 @@ const EditExercisePage = () =>
             </div>
             <div>
                 <img 
-                    style={{position: "absolute"}}
+                    style={{position: "relative"}}
                     src={`${process.env.PUBLIC_URL}/Muscles/MuscleChart.png`} 
                     alt="MuscleChart"
                     width="300px"/>
-                <img 
-                    style={{position: "relative"}}
-                    src={`${process.env.PUBLIC_URL}/Muscles/Triceps.png`} 
-                    alt="Triceps"
-                    width="300px"/>
+                {
+                    muscleList
+                        .map
+                        (
+                            muscle =>
+                                <img 
+                                    key={muscle.id}
+                                    style={{position: "absolute", left: "40px"}}
+                                    src={`${process.env.PUBLIC_URL}/Muscles/${muscle.anatomicalName}.png`} 
+                                    alt={muscle.simpleName}
+                                    width="300px"/>
+                        )
+                }
             </div>
         </div>
     );

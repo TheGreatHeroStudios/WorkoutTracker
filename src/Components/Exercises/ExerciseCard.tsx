@@ -90,6 +90,7 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                                 iconPath =>
                                 (
                                     <CardMedia 
+                                        key={iconPath}
                                         component="img"
                                         image={iconPath} 
                                         sx=

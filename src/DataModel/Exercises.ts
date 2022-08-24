@@ -56,32 +56,34 @@ export const GET_EXERCISE_BY_ID = gql `
 
 export const ConvertQueryResultsToExercises: (results: any) => Exercise[] =
     (results) =>
-        results
-            .exercise
-            .map
-            (
-                ex =>
+        results === null || results === undefined ?
+            results :
+            results
+                .exercise
+                .map
                 (
-                    {
-                        id: ex.exercise_id,
-                        name: ex.exercise_name,
-                        muscles: 
-                            ex
-                                .exercise_muscles
-                                .map
-                                (
-                                    ex_muscle =>
+                    ex =>
+                    (
+                        {
+                            id: ex.exercise_id,
+                            name: ex.exercise_name,
+                            muscles: 
+                                ex
+                                    .exercise_muscles
+                                    .map
                                     (
-                                        {
-                                            anatomicalName: ex_muscle.muscle.muscle_long_desc,
-                                            simpleName: ex_muscle.muscle.muscle_short_desc,
-                                            muscleGroupName: ex_muscle.muscle.muscle_group.muscle_group_desc
-                                        }
+                                        ex_muscle =>
+                                        (
+                                            {
+                                                anatomicalName: ex_muscle.muscle.muscle_long_desc,
+                                                simpleName: ex_muscle.muscle.muscle_short_desc,
+                                                muscleGroupName: ex_muscle.muscle.muscle_group.muscle_group_desc
+                                            }
+                                        )
                                     )
-                                )
-                    }
-                )
-            );
+                        }
+                    )
+                );
 
 export const InitExercise: () => Exercise =
 () => 

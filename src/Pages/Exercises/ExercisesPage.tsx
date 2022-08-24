@@ -27,6 +27,7 @@ const ExercisesPage = () =>
                             ex =>
                             (
                                 <ExerciseCard 
+                                    key={ex.id}
                                     exercise={ex}
                                     sx=
                                     {{
