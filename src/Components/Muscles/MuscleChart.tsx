@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Tooltip } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 import { ConvertQueryResultsToMuscles, GET_MUSCLES, Muscle } from "../../DataModel/Muscles";
 
@@ -8,6 +8,7 @@ interface MuscleChartProps
     chartWidth?: number;
     chartHeight?: number;
     selectedMuscles: Muscle[];
+    SelectedMusclesChanged: (selectedMuscles: Muscle[]) => void;
 }
 
 const muscleImageRootPath = `${process.env.PUBLIC_URL}/Muscles/`;
@@ -30,7 +31,7 @@ const GetRelativeMouseCoordinate = (e) =>
 }
 
 
-const MuscleChart = ({chartWidth, chartHeight, selectedMuscles}: MuscleChartProps) =>
+const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesChanged}: MuscleChartProps) =>
 {
     chartWidth = chartWidth ?? defaultDimensions.width;
     chartHeight = chartHeight ?? defaultDimensions.height;
@@ -156,27 +157,61 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles}: MuscleChartProp
             mouseCoordinates.y < chartHeight
         )
         {
-            const muscleId = muscleMap[mouseCoordinates.x][mouseCoordinates.y];
+            const targetedMuscleId = muscleMap[mouseCoordinates.x][mouseCoordinates.y];
 
-            if(muscleId !== (focusedMuscle?.id ?? -1))
+            const targetedMuscle =
+                muscleList
+                    .filter
+                    (
+                        muscle => muscle.id === targetedMuscleId
+                    )[0] ?? null;
+
+            if(targetedMuscleId !== (focusedMuscle?.id ?? -1))
             {
-                //If the focused muscle changed, update its state
-                const targetMuscle =
-                    muscleList
-                        .filter
-                        (
-                            muscle => muscle.id === muscleId
-                        )[0];
-
-                if(targetMuscle !== undefined && targetMuscle !== null)
+                if(targetedMuscle !== undefined && targetedMuscle !== null)
                 {
-                    SetFocusedMuscle(targetMuscle);
+                    //If the focused muscle changed, update its state
+                    SetFocusedMuscle(targetedMuscle);
+                    return targetedMuscle;
                 }
                 else
                 {
+                    //f no muscle was targeted, clear the focused muscle
                     SetFocusedMuscle(null);
+                    return null;
                 }
             }
+            
+            return focusedMuscle;
+        }
+    }
+
+    const ToggleMuscle = (e) =>
+    {
+        const toggledMuscle = UpdateFocusedMuscle(e);
+
+        if(toggledMuscle !== null)
+        {
+            if
+            (
+                selectedMuscles
+                    .filter(muscle => muscle.id === toggledMuscle.id).length > 0
+            )
+            {
+                //If the target muscle is already  
+                //part of the selected list, remove it...
+                selectedMuscles = 
+                    selectedMuscles
+                        .filter(muscle => muscle.id !== toggledMuscle.id);
+            }
+            else
+            {
+                //...otherwise, add it to the selected list
+                selectedMuscles =
+                    [...selectedMuscles, toggledMuscle];
+            }
+
+            SelectedMusclesChanged(selectedMuscles);
         }
     }
 
@@ -206,34 +241,46 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles}: MuscleChartProp
     );
 
     return (
-        <div 
-            style={{width: chartWidth, height: chartHeight}} 
-            onMouseMove={(e) => UpdateFocusedMuscle(e)}
-            onClick={GetRelativeMouseCoordinate}>
-            <img 
-                style={{position: "absolute", left: "0px"}}
-                src={`${muscleImageRootPath}MuscleChart.png`} 
-                alt="MuscleChart"
-                width={chartWidth}
-                height={chartHeight}/>
-                <div>
+        <div style={{display: "flex", flexDirection: "column"}}>
+            <Typography variant="overline" align="left" sx={{marginTop: "20px"}}>
+                Muscle Group(s)
+            </Typography>
+            <div 
+                style={{width: chartWidth, height: chartHeight}} 
+                onMouseMove={UpdateFocusedMuscle}
+                onClick={ToggleMuscle}>
+                <img 
+                    style={{position: "absolute", left: "0px"}}
+                    src={`${muscleImageRootPath}MuscleChart.png`} 
+                    alt="MuscleChart"
+                    width={chartWidth}
+                    height={chartHeight}/>
+                    <div>
+                    {
+                        selectedMuscles
+                            .map
+                            (
+                                muscle =>
+                                    muscle !== null && muscle !== undefined &&
+                                    <img 
+                                        id={muscle.id.toString()}
+                                        key={muscle.id}
+                                        style={{position: "absolute", left: "0px"}}
+                                        src={`${muscleImageRootPath}${muscle.anatomicalName}.png`} 
+                                        alt={muscle.simpleName}
+                                        width={chartWidth}
+                                        height={chartHeight}/>
+                            )
+                    }
+                    </div>
+            </div>
+            <Typography variant="body1">
                 {
-                    selectedMuscles
-                        .map
-                        (
-                            muscle =>
-                                muscle !== null && muscle !== undefined &&
-                                <img 
-                                    id={muscle.id.toString()}
-                                    key={muscle.id}
-                                    style={{position: "absolute", left: "0px"}}
-                                    src={`${muscleImageRootPath}${muscle.anatomicalName}.png`} 
-                                    alt={muscle.simpleName}
-                                    width={chartWidth}
-                                    height={chartHeight}/>
-                        )
+                    focusedMuscle !== undefined && focusedMuscle !== null ?
+                        `${focusedMuscle.anatomicalName} (${focusedMuscle.simpleName})` :
+                        ""
                 }
-                </div>
+            </Typography>
         </div>
     );
 }

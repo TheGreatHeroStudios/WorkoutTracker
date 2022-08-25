@@ -5,14 +5,14 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import MuscleChart from "../../Components/Muscles/MuscleChart";
 import { ConvertQueryResultsToExercises, GET_EXERCISE_BY_ID } from "../../DataModel/Exercises";
-import { ConvertQueryResultsToMuscles, GET_MUSCLES, Muscle } from "../../DataModel/Muscles";
+import { Muscle } from "../../DataModel/Muscles";
 
 const EditExercisePage = () =>
 {
     const { exerciseId } = useParams();
 
-    const [exerciseName, setExerciseName] = useState("");
-    const [exerciseMuscles, setExerciseMuscles] = useState<Muscle[]>([]);
+    const [exerciseName, SetExerciseName] = useState("");
+    const [exerciseMuscles, SetExerciseMuscles] = useState<Muscle[]>([]);
 
     const setExerciseInContext = (exerciseData: any) =>
     {
@@ -21,8 +21,8 @@ const EditExercisePage = () =>
 
         if(exercises !== null && exercises !== undefined && exercises.length > 0)
         {
-            setExerciseName(exercises[0].name);
-            setExerciseMuscles(exercises[0].muscles);
+            SetExerciseName(exercises[0].name);
+            SetExerciseMuscles(exercises[0].muscles);
         }
     }
 
@@ -61,7 +61,7 @@ const EditExercisePage = () =>
                     value={exerciseName ?? "New Exercise"}
                     onChange=
                     {
-                        (e) => setExerciseName(e.target.value)
+                        (e) => SetExerciseName(e.target.value)
                     } />
                 <AddAPhoto
                     sx=
@@ -73,7 +73,9 @@ const EditExercisePage = () =>
                         width: "20vw"
                     }} />
             </div>
-            <MuscleChart selectedMuscles={exerciseMuscles} />
+            <MuscleChart 
+                selectedMuscles={exerciseMuscles}
+                SelectedMusclesChanged={SetExerciseMuscles} />
         </div>
     );
 }

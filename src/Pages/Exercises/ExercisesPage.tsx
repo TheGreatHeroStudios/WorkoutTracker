@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { Container } from "@mui/material";
+import { CircularProgress, Container, Skeleton } from "@mui/material";
+import { width } from "@mui/system";
 import React from "react";
 import ExerciseCard from "../../Components/Exercises/ExerciseCard";
 import { GET_EXERCISES, ConvertQueryResultsToExercises } from "../../DataModel/Exercises";
@@ -11,7 +12,7 @@ const ExercisesPage = () =>
 
     return (
         loading ?
-            <h1>Loading...</h1> :
+            <CircularProgress color="primary" size="15vw" sx={{margin: "auto"}} />  :
         error ?    
             <h1>Error loading exercise data: {error.message}</h1> :
             <Container 
