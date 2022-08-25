@@ -42,6 +42,7 @@ export const GET_EXERCISE_BY_ID = gql `
             {
                 muscle 
                 {
+                    muscle_id
                     muscle_short_desc
                     muscle_long_desc
                     muscle_group 
@@ -75,6 +76,7 @@ export const ConvertQueryResultsToExercises: (results: any) => Exercise[] =
                                         ex_muscle =>
                                         (
                                             {
+                                                id: ex_muscle.muscle.muscle_id,
                                                 anatomicalName: ex_muscle.muscle.muscle_long_desc,
                                                 simpleName: ex_muscle.muscle.muscle_short_desc,
                                                 muscleGroupName: ex_muscle.muscle.muscle_group.muscle_group_desc

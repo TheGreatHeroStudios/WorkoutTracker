@@ -1,18 +1,18 @@
 import { useQuery } from "@apollo/client";
 import { AddAPhoto } from "@mui/icons-material";
 import { TextField } from "@mui/material";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ConvertQueryResultsToExercises, Exercise, GET_EXERCISE_BY_ID, InitExercise } from "../../DataModel/Exercises";
+import MuscleChart from "../../Components/Muscles/MuscleChart";
+import { ConvertQueryResultsToExercises, GET_EXERCISE_BY_ID } from "../../DataModel/Exercises";
 import { ConvertQueryResultsToMuscles, GET_MUSCLES, Muscle } from "../../DataModel/Muscles";
-import UpdateObject from "../../Utility/UpdateObject";
 
 const EditExercisePage = () =>
 {
     const { exerciseId } = useParams();
 
-    const [muscleList, setMuscleList] = useState<Muscle[]>([]);
-    const [exerciseName, setExerciseName] = useState("Exercise");
+    const [exerciseName, setExerciseName] = useState("");
+    const [exerciseMuscles, setExerciseMuscles] = useState<Muscle[]>([]);
 
     const setExerciseInContext = (exerciseData: any) =>
     {
@@ -22,31 +22,9 @@ const EditExercisePage = () =>
         if(exercises !== null && exercises !== undefined && exercises.length > 0)
         {
             setExerciseName(exercises[0].name);
+            setExerciseMuscles(exercises[0].muscles);
         }
     }
-
-    useQuery
-    (
-        GET_MUSCLES,
-        {
-            onCompleted:
-                (queryResults) =>
-                {
-                    const muscles =
-                        ConvertQueryResultsToMuscles(queryResults);
-
-                    if(muscles.length > 0)
-                    {
-                        setMuscleList(muscles);
-                    }
-                },
-            onError:
-                (error) =>
-                {
-                    console.log(error.message);
-                }
-        }
-    );
 
     useQuery
     (
@@ -95,26 +73,7 @@ const EditExercisePage = () =>
                         width: "20vw"
                     }} />
             </div>
-            <div>
-                <img 
-                    style={{position: "relative"}}
-                    src={`${process.env.PUBLIC_URL}/Muscles/MuscleChart.png`} 
-                    alt="MuscleChart"
-                    width="300px"/>
-                {
-                    muscleList
-                        .map
-                        (
-                            muscle =>
-                                <img 
-                                    key={muscle.id}
-                                    style={{position: "absolute", left: "40px"}}
-                                    src={`${process.env.PUBLIC_URL}/Muscles/${muscle.anatomicalName}.png`} 
-                                    alt={muscle.simpleName}
-                                    width="300px"/>
-                        )
-                }
-            </div>
+            <MuscleChart selectedMuscles={exerciseMuscles} />
         </div>
     );
 }
