@@ -1,6 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { CircularProgress, Container, Skeleton } from "@mui/material";
-import { width } from "@mui/system";
+import { CircularProgress, Container } from "@mui/material";
 import React from "react";
 import ExerciseCard from "../../Components/Exercises/ExerciseCard";
 import { GET_EXERCISES, ConvertQueryResultsToExercises } from "../../DataModel/Exercises";

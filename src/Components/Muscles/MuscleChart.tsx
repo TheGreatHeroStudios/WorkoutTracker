@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Tooltip, Typography } from "@mui/material";
+import { Skeleton, Typography } from "@mui/material";
 import { useState } from "react";
 import { ConvertQueryResultsToMuscles, GET_MUSCLES, Muscle } from "../../DataModel/Muscles";
 
@@ -241,47 +241,56 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
     );
 
     return (
-        <div style={{display: "flex", flexDirection: "column"}}>
-            <Typography variant="overline" align="left" sx={{marginTop: "20px"}}>
-                Muscle Group(s)
-            </Typography>
-            <div 
-                style={{width: chartWidth, height: chartHeight}} 
-                onMouseMove={UpdateFocusedMuscle}
-                onClick={ToggleMuscle}>
-                <img 
-                    style={{position: "absolute", left: "0px"}}
-                    src={`${muscleImageRootPath}MuscleChart.png`} 
-                    alt="MuscleChart"
-                    width={chartWidth}
-                    height={chartHeight}/>
-                    <div>
+        !muscleMapLoaded ?
+            <div>
+                <Skeleton animation="wave" width="120px" height="28px" sx={{marginTop: "20px"}}/>
+                <Skeleton 
+                    variant="rectangular" 
+                    animation="pulse" 
+                    width={chartWidth} 
+                    height={chartHeight} />
+            </div> :
+            <div style={{display: "flex", flexDirection: "column"}}>
+                <Typography variant="overline" align="left" sx={{marginTop: "20px"}}>
+                    Muscle Group(s)
+                </Typography>
+                <div 
+                    style={{width: chartWidth, height: chartHeight}} 
+                    onMouseMove={UpdateFocusedMuscle}
+                    onClick={ToggleMuscle}>
+                    <img 
+                        style={{position: "absolute", left: "0px"}}
+                        src={`${muscleImageRootPath}MuscleChart.png`} 
+                        alt="MuscleChart"
+                        width={chartWidth}
+                        height={chartHeight}/>
+                        <div>
+                        {
+                            selectedMuscles
+                                .map
+                                (
+                                    muscle =>
+                                        muscle !== null && muscle !== undefined &&
+                                        <img 
+                                            id={muscle.id.toString()}
+                                            key={muscle.id}
+                                            style={{position: "absolute", left: "0px"}}
+                                            src={`${muscleImageRootPath}${muscle.anatomicalName}.png`} 
+                                            alt={muscle.simpleName}
+                                            width={chartWidth}
+                                            height={chartHeight}/>
+                                )
+                        }
+                        </div>
+                </div>
+                <Typography variant="body1">
                     {
-                        selectedMuscles
-                            .map
-                            (
-                                muscle =>
-                                    muscle !== null && muscle !== undefined &&
-                                    <img 
-                                        id={muscle.id.toString()}
-                                        key={muscle.id}
-                                        style={{position: "absolute", left: "0px"}}
-                                        src={`${muscleImageRootPath}${muscle.anatomicalName}.png`} 
-                                        alt={muscle.simpleName}
-                                        width={chartWidth}
-                                        height={chartHeight}/>
-                            )
+                        focusedMuscle !== undefined && focusedMuscle !== null ?
+                            `${focusedMuscle.anatomicalName} (${focusedMuscle.simpleName})` :
+                            ""
                     }
-                    </div>
+                </Typography>
             </div>
-            <Typography variant="body1">
-                {
-                    focusedMuscle !== undefined && focusedMuscle !== null ?
-                        `${focusedMuscle.anatomicalName} (${focusedMuscle.simpleName})` :
-                        ""
-                }
-            </Typography>
-        </div>
     );
 }
 

@@ -1,11 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { AddAPhoto } from "@mui/icons-material";
-import { TextField } from "@mui/material";
+import { IconButton, Skeleton, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import MuscleChart from "../../Components/Muscles/MuscleChart";
 import { ConvertQueryResultsToExercises, GET_EXERCISE_BY_ID } from "../../DataModel/Exercises";
 import { Muscle } from "../../DataModel/Muscles";
+import { ImagePicker } from "react-file-picker";
 
 const EditExercisePage = () =>
 {
@@ -26,23 +27,24 @@ const EditExercisePage = () =>
         }
     }
 
-    useQuery
-    (
-        GET_EXERCISE_BY_ID,
-        {
-            variables: 
+    const { loading: exerciseDataLoading } =
+        useQuery
+        (
+            GET_EXERCISE_BY_ID,
             {
-                exerciseId: exerciseId ?? -1,
-            },
-            onCompleted:
-                (queryResults) => setExerciseInContext(queryResults),
-            onError:
-                (error) =>
+                variables: 
                 {
-                    console.log(error.message);
-                }
-        }
-    );
+                    exerciseId: exerciseId ?? -1,
+                },
+                onCompleted:
+                    (queryResults) => setExerciseInContext(queryResults),
+                onError:
+                    (error) =>
+                    {
+                        console.log(error.message);
+                    }
+            }
+        );
 
     return (
         <div 
@@ -53,26 +55,47 @@ const EditExercisePage = () =>
                 paddingLeft: "20px",
                 paddingTop: "20px"
             }}>
-            <div style={{display: "flex", flexDirection: "row"}}>
-                <TextField
-                    required
-                    id="outlined-required"
-                    label="Exercise Name"
-                    value={exerciseName ?? "New Exercise"}
-                    onChange=
-                    {
-                        (e) => SetExerciseName(e.target.value)
-                    } />
-                <AddAPhoto
-                    sx=
-                    {{
-                        alignSelf: "center", 
-                        marginLeft: "10px", 
-                        fontSize: "40px",
-                        color: "#CCCCCC",
-                        width: "20vw"
-                    }} />
-            </div>
+            {
+                exerciseDataLoading ?
+                    <div style={{display: "flex", flexDirection: "row"}}>
+                        <Skeleton 
+                            animation="wave" 
+                            width="250px" 
+                            height="100px"
+                            sx={{marginTop: "-15px"}} />
+                        <Skeleton 
+                            variant="rectangular"
+                            animation="pulse" 
+                            width="20vw" 
+                            height="20vw"
+                            sx={{marginLeft: "10px"}} />
+                    </div> :
+                    <div style={{display: "flex", flexDirection: "row"}}>
+                        <TextField
+                            required
+                            id="outlined-required"
+                            label="Exercise Name"
+                            value={exerciseName ?? "New Exercise"}
+                            onChange=
+                            {
+                                (e) => SetExerciseName(e.target.value)
+                            }
+                            sx={{paddingTop: "10px"}} />
+                        <ImagePicker extensions={['jpg', 'jpeg', 'png']}>
+                            <IconButton>
+                                <AddAPhoto
+                                    sx=
+                                    {{
+                                        alignSelf: "center", 
+                                        marginLeft: "10px", 
+                                        fontSize: "40px",
+                                        color: "#CCCCCC",
+                                        width: "20vw"
+                                    }} />
+                            </IconButton>
+                        </ImagePicker>
+                    </div>
+            }
             <MuscleChart 
                 selectedMuscles={exerciseMuscles}
                 SelectedMusclesChanged={SetExerciseMuscles} />
