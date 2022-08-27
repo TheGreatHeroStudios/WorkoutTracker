@@ -6,6 +6,7 @@ import AppShell from './Layout/AppShell.tsx';
 import WorkoutsPage from './Pages/Workouts/WorkoutsPage.tsx';
 import ExercisesPage from './Pages/Exercises/ExercisesPage.tsx';
 import EditExercisePage from './Pages/Exercises/EditExercisePage.tsx';
+import CachableRestClientProvider from './Utility/CachableRestClientProvider.tsx';
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
     );
 
   return (
-    <ApolloProvider client={apolloClient}>
+    <CachableRestClientProvider baseUrl="https://localhost:7134/" cacheExpirationSeconds={3600} >
       <div className="App">
         <Router>
           <Routes>
@@ -88,7 +89,7 @@ function App() {
           </Routes>
         </Router>
       </div>
-    </ApolloProvider>
+    </CachableRestClientProvider>
   );
 }
 
