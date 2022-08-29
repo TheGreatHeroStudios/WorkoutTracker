@@ -10,8 +10,8 @@ export interface ExerciseCardProps
 {
     sx?: SxProps<Theme>;
     exercise: Exercise | null;
+    onEditExercise: (selectedExercise: Exercise) => void;
 }
-
 
 const ExerciseCard = (props: ExerciseCardProps) =>
 {
@@ -80,7 +80,7 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                         alignSelf: "start", 
                         fontWeight: "bold"
                     }}>
-                    {props.exercise?.name ?? "Exercise"}
+                    {props.exercise?.exerciseName ?? "Exercise"}
                 </Typography>
                 <Box sx={{display: "flex", flexDirection: "row"}}>
                     {
@@ -110,7 +110,7 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                     width: "10vw",
                     justifyItems: "center"
                 }} >
-                <IconButton onClick={() => navigate(props.exercise == null ? "./add" : `./edit/${props.exercise?.id}`)}>
+                <IconButton onClick={() => props.onEditExercise(props.exercise)}>
                     <Edit sx={{fontSize: 25, marginTop: "2vh", marginRight: "2vw"}}/>
                 </IconButton>
             </Box>

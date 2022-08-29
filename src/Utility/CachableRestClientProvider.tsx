@@ -1,13 +1,20 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-interface CachableRestClientContextProps
+export interface QueryResponseData<TResult>
+{
+    result: TResult[] | any[];
+    loading: boolean;
+    errorMessage: string;
+}
+
+export interface CachableRestClientContextProps
 {
     useCacheableGetRequest?: 
         <TResult> (
             resourcePath: string, 
             queryParams: {paramName: string, paramValue: string}[],
-            mutator?: (queryResults: any) => TResult | any
-        ) => {result: TResult | any, loading: boolean, errorMessage: string }
+            mutator: (queryResults: any) => TResult[]
+        ) => QueryResponseData<TResult>
 }
 
 const CachableRestClientContext = 
@@ -17,12 +24,12 @@ export function useCacheableGetRequest<TResult>
 (
     resourcePath: string, 
     queryParams: {paramName: string, paramValue: string}[],
-    mutator?: (queryResults: any) => TResult | any
+    mutator: (queryResults: any) => TResult[]
 )
 {
     return (
         useContext(CachableRestClientContext)
-            .useCacheableGetRequest
+            .useCacheableGetRequest<TResult>
             (
                 resourcePath,
                 queryParams,
@@ -31,110 +38,163 @@ export function useCacheableGetRequest<TResult>
     );
 }
 
-const CachableRestClientProvider = 
-(
-    {children}, 
-    baseUrl: string, 
-    cacheExpirationSeconds: number
-) =>
+export interface CachableRestClientProviderProps
 {
-    const [requestCache, SetRequestCache] = 
-        useState<{pathKey: string, cachedData: any, timestamp: number}[]>([]);
-
-    function ExecuteCachableGetRequest<TResult>
-    (
-        resource: string, 
-        queryParams: {paramName: string, paramValue: string}[],
-        mutator?: (queryResults: any) => TResult | any,
-        forceRefetch: boolean = false
-    )
-    {
-        //Purge out any cache elements that have expired.
-        SetRequestCache
-        (
-            requestCache
-                .filter
-                (
-                    cacheItem =>
-                        (Math.abs(new Date().getTime() - cacheItem.timestamp) / 1000) < 
-                        cacheExpirationSeconds
-                )
-        )
-
-        const queryTuple = {result: null, loading: true, errorMessage: null};
-
-        //Append the resource and any query parameters to the request path
-        let requestPath = resource;
-
-        if(queryParams.length > 0)
-        {
-            requestPath += "?";
-
-            queryParams
-                .forEach
-                (
-                    param =>
-                        requestPath += `${param.paramName}=${param.paramValue}`
-                );
-        }
-
-        //Attempt to retrieve the data from the
-        //cache by looking up the request string
-        queryTuple.result = requestCache[requestPath];
-
-        if
-        (
-            queryTuple.result === undefined || 
-            queryTuple.result === null ||
-            forceRefetch
-        )
-        {
-            //If the query is not cached (or a refetch is requested)
-            //retrieve the data by making a new REST request.
-            /*const client = new Client();
-
-            client.get
-            (
-                `${baseUrl}${requestPath}`,
-                (data, response) =>
-                {
-                    //If a mutator was provided, use it 
-                    //to transform the query results
-                    queryTuple.result = 
-                        mutator !== null && mutator !== undefined ?
-                            mutator(data) :
-                            data; 
-
-                    //Add the request string and data to the cache
-                    requestCache[requestPath] = 
-                        {
-                            cacheData: queryTuple.result,
-                            timestamp: new Date().getTime()
-                        };
-
-                    queryTuple.loading = false;
-                }
-            );*/
-        }
-        else
-        {
-            queryTuple.loading = false;
-        }
-
-        return queryTuple;
-    };
-
-    return (
-        <CachableRestClientContext.Provider 
-            value=
-            {
-                {
-                    useCacheableGetRequest: ExecuteCachableGetRequest,
-                }
-            } >
-            {children}
-        </CachableRestClientContext.Provider>
-    );
+    children: ReactNode;
+    baseUrl: string;
+    cacheExpirationSeconds: number;
 }
+
+export interface QueryCacheEntry<TResult>
+{
+    pathKey: string;
+    cachedData: TResult[] | any[];
+    timestamp: number;
+}
+
+const CachableRestClientProvider = 
+    (props: CachableRestClientProviderProps) =>
+    {
+        let [requestCache, SetRequestCache] = useState<QueryCacheEntry<any>[]>([]);
+
+        function ExecuteCachableGetRequest<TResult>
+        (
+            resource: string, 
+            queryParams: {paramName: string, paramValue: string}[],
+            mutator: (queryResults: any) => TResult[],
+            forceRefetch: boolean = false
+        )
+        {
+            //Purge out any cache elements that have expired.
+            /*SetRequestCache
+            (
+                requestCache
+                    .filter
+                    (
+                        cacheItem =>
+                            (Math.abs(new Date().getTime() - cacheItem.timestamp) / 1000) < 
+                            cacheExpirationSeconds
+                    )
+            )*/
+
+            const responseData: QueryResponseData<TResult> = 
+                {
+                    result: [], 
+                    loading: true, 
+                    errorMessage: null
+                };
+
+            //Append the resource and any query parameters to the request path
+            let requestPath = resource;
+
+            if(queryParams.length > 0)
+            {
+                requestPath += "?";
+
+                queryParams
+                    .forEach
+                    (
+                        param =>
+                            requestPath += `${param.paramName}=${param.paramValue}`
+                    );
+            }
+
+            //Attempt to retrieve the data from the
+            //cache by looking up the request string
+            const locatedCacheEntry = 
+                requestCache
+                    .filter
+                    (
+                        cacheEntry =>
+                            cacheEntry.pathKey === requestPath
+                    )[0];
+                    
+            if
+            (
+                !locatedCacheEntry ||
+                forceRefetch
+            )
+            {
+                let isErrorResponse: boolean = false;
+                
+                //If the query is not cached (or a refetch is requested)
+                //add a new cache entry and replace any with the same key
+                let newCacheEntry: QueryCacheEntry<TResult> =
+                    {
+                        pathKey: requestPath,
+                        cachedData: [],
+                        timestamp: new Date().getTime()
+                    };
+
+                requestCache =
+                    requestCache
+                        .filter
+                        (
+                            cacheEntry =>
+                                cacheEntry.pathKey !== requestPath
+                        )
+                        .concat(newCacheEntry);
+
+                //Retrieve the data by making a new REST request.
+                fetch(`${props.baseUrl}${requestPath}`)
+                    .then
+                    (
+                        response => 
+                        {
+                            if(!response.ok)
+                            {
+                                isErrorResponse = true;
+                            }
+
+                            return response.json();
+                        },
+                        error =>
+                        {
+                            responseData.loading = false;
+                            responseData.errorMessage = JSON.stringify(error);
+                        }
+                    )
+                    .then
+                    (
+                        data =>
+                        {
+                            if(isErrorResponse)
+                            {
+                                responseData.errorMessage = data;
+                            }
+                            else
+                            {
+                                //Use the provided mutator to transform query results.
+                                responseData.result = mutator(data); 
+            
+                                //Update the new cache entry with the loaded data
+                                newCacheEntry.cachedData = responseData.result;
+                            }
+
+                            responseData.loading = false;
+                        }
+                    );
+            }
+            else
+            {
+                responseData.result = locatedCacheEntry.cachedData;
+                responseData.loading = false;
+            }
+
+            return responseData;
+        };
+
+        return (
+            <CachableRestClientContext.Provider 
+                value=
+                {
+                    {
+                        useCacheableGetRequest: ExecuteCachableGetRequest,
+                    }
+                } >
+                {props.children}
+            </CachableRestClientContext.Provider>
+        );
+    }
 
 export default CachableRestClientProvider;

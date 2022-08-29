@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
 import { Skeleton, Typography } from "@mui/material";
 import { useState } from "react";
-import { ConvertQueryResultsToMuscles, GET_MUSCLES, Muscle } from "../../DataModel/Muscles";
+import { Muscle } from "../../DataModel/Muscles";
+import { useGetRequest } from "../../Utility/RestClient";
 
 interface MuscleChartProps
 {
@@ -13,7 +14,6 @@ interface MuscleChartProps
 
 const muscleImageRootPath = `${process.env.PUBLIC_URL}/Muscles/`;
 const defaultDimensions = {width: 350, height: 328};
-
 
 const GetRelativeMouseCoordinate = (e) =>
 {
@@ -29,7 +29,6 @@ const GetRelativeMouseCoordinate = (e) =>
 
     return mouseCoordinate;
 }
-
 
 const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesChanged}: MuscleChartProps) =>
 {
@@ -91,7 +90,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                                     if(indexedPixels[col][row] === -1)
                                     {
                                         indexedPixels[col][row] = muscleId;
-                                        //console.log(`Muscle Found! (Muscle Id: ${muscleId} at pixel index ${col}, ${row})`);
+                                        console.log(`Muscle Found! (Muscle Id: ${muscleId} at pixel index ${col}, ${row})`);
                                     }
                                 }
                             }
@@ -120,7 +119,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                                             canvas.height = chartHeight;
                                             canvas.getContext("2d").drawImage(img, 0, 0, chartWidth, chartHeight);
                                             
-                                            IndexPixels(muscle.id, canvas.getContext("2d"));
+                                            IndexPixels(muscle.muscleId, canvas.getContext("2d"));
                                             resolve(true);
                                         };
                                 }
@@ -163,10 +162,10 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                 muscleList
                     .filter
                     (
-                        muscle => muscle.id === targetedMuscleId
+                        muscle => muscle.muscleId === targetedMuscleId
                     )[0] ?? null;
 
-            if(targetedMuscleId !== (focusedMuscle?.id ?? -1))
+            if(targetedMuscleId !== (focusedMuscle?.muscleId ?? -1))
             {
                 if(targetedMuscle !== undefined && targetedMuscle !== null)
                 {
@@ -195,14 +194,14 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
             if
             (
                 selectedMuscles
-                    .filter(muscle => muscle.id === toggledMuscle.id).length > 0
+                    .filter(muscle => muscle.muscleId === toggledMuscle.muscleId).length > 0
             )
             {
                 //If the target muscle is already  
                 //part of the selected list, remove it...
                 selectedMuscles = 
                     selectedMuscles
-                        .filter(muscle => muscle.id !== toggledMuscle.id);
+                        .filter(muscle => muscle.muscleId !== toggledMuscle.muscleId);
             }
             else
             {
@@ -215,27 +214,15 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
         }
     }
 
-    useQuery
+    useGetRequest<Muscle>
     (
-        GET_MUSCLES,
         {
-            onCompleted:
-                (queryResults) =>
+            requestUrl: "http://localhost:5134/muscle",
+            onComplete: 
+                (queryResults) => 
                 {
-                    const muscles =
-                        ConvertQueryResultsToMuscles(queryResults);
-
-                    SetMuscleList(muscles);
-
-                    if(muscles.length > 0 && !muscleMapLoaded)
-                    {
-                        LoadMuscleMap(muscles);
-                    }
-                },
-            onError:
-                (error) =>
-                {
-                    console.log(error.message);
+                    SetMuscleList(queryResults);
+                    LoadMuscleMap(queryResults);
                 }
         }
     );
@@ -272,8 +259,8 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                                     muscle =>
                                         muscle !== null && muscle !== undefined &&
                                         <img 
-                                            id={muscle.id.toString()}
-                                            key={muscle.id}
+                                            id={muscle.muscleId.toString()}
+                                            key={muscle.muscleId}
                                             style={{position: "absolute", left: "0px"}}
                                             src={`${muscleImageRootPath}${muscle.anatomicalName}.png`} 
                                             alt={muscle.simpleName}
