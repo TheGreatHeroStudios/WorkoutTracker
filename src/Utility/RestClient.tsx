@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 interface RestRequestProps
 {
-    requestUrl: string;
+    resourcePath: string;
     queryParams?: {paramName: string, paramValue: string}[];
     onComplete?: (queryResults: any) => void;
     onError?: (error: string) => void;
@@ -11,7 +11,7 @@ interface RestRequestProps
 export function useGetRequest<TResult>
 (
     {
-        requestUrl, 
+        resourcePath, 
         queryParams, 
         onComplete, 
         onError
@@ -39,16 +39,14 @@ export function useGetRequest<TResult>
                 queryString =
                     queryString.substring(0, queryString.length - 1);
             }
+            
             fetch
             (
-                `${requestUrl}${queryString}`,
-                {
-                    mode: "no-cors"
-                }
+                `${resourcePath}${queryString}`
             )
             .then
             (
-                response => 
+                response => {
                     response
                         .json()
                         .then
@@ -70,7 +68,7 @@ export function useGetRequest<TResult>
                             },
                             rejectReason =>
                             {
-                                SetError(rejectReason);
+                                SetError(JSON.stringify(rejectReason));
 
                                 if
                                 (
@@ -78,12 +76,12 @@ export function useGetRequest<TResult>
                                     onError !== null
                                 )
                                 {
-                                    onError(rejectReason);
+                                    onError(JSON.stringify(rejectReason));
                                 }
 
                                 SetDataLoading(false);
                             }
-                        ),
+                        )},
                 error => 
                 {
                     SetError(error.message);

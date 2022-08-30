@@ -15,6 +15,9 @@ interface MuscleChartProps
 const muscleImageRootPath = `${process.env.PUBLIC_URL}/Muscles/`;
 const defaultDimensions = {width: 350, height: 328};
 
+const GetImageResourcePath = (anatomicalName: string) => 
+    `${muscleImageRootPath}${anatomicalName.replace(new RegExp("\\s"), "")}.png`;
+
 const GetRelativeMouseCoordinate = (e) =>
 {
     const targetRect = e.target.getBoundingClientRect();
@@ -109,7 +112,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                                 (resolve, reject) =>
                                 {
                                     const img = new Image(chartWidth, chartHeight);
-                                    img.src = `${muscleImageRootPath}${muscle.anatomicalName}.png`;
+                                    img.src = GetImageResourcePath(muscle.anatomicalName);
                                     img.onerror = reject;
                                     img.onload = 
                                         () =>
@@ -217,7 +220,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
     useGetRequest<Muscle>
     (
         {
-            requestUrl: "http://localhost:5134/muscle",
+            resourcePath: "/muscle",
             onComplete: 
                 (queryResults) => 
                 {
@@ -262,7 +265,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                                             id={muscle.muscleId.toString()}
                                             key={muscle.muscleId}
                                             style={{position: "absolute", left: "0px"}}
-                                            src={`${muscleImageRootPath}${muscle.anatomicalName}.png`} 
+                                            src={GetImageResourcePath(muscle.anatomicalName)} 
                                             alt={muscle.simpleName}
                                             width={chartWidth}
                                             height={chartHeight}/>

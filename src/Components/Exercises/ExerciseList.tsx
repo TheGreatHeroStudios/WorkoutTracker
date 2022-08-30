@@ -15,7 +15,7 @@ const ExerciseList = ({onEditExercise}: ExerciseListProps) =>
         useGetRequest<Exercise>
         (
             {
-                requestUrl: "http://192.168.1.159:5134/exercise",
+                resourcePath: "/exercise",
                 queryParams:
                     [
                         {paramName: "pageIndex", paramValue: "0"},

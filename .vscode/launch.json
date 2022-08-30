@@ -2,9 +2,9 @@
     "configurations": [
         {
             "type": "pwa-chrome",
-            "name": "http://localhost:3000/exercises",
+            "name": "http://localhost:4002/exercises",
             "request": "launch",
-            "url": "http://localhost:3000/exercises"
+            "url": "http://localhost:4002/exercises"
         }
     ]
 }
