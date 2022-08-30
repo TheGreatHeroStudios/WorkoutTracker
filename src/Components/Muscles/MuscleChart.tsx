@@ -93,7 +93,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                                     if(indexedPixels[col][row] === -1)
                                     {
                                         indexedPixels[col][row] = muscleId;
-                                        console.log(`Muscle Found! (Muscle Id: ${muscleId} at pixel index ${col}, ${row})`);
+                                        //console.log(`Muscle Found! (Muscle Id: ${muscleId} at pixel index ${col}, ${row})`);
                                     }
                                 }
                             }

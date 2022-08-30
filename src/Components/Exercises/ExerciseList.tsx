@@ -37,7 +37,7 @@ const ExerciseList = ({onEditExercise}: ExerciseListProps) =>
                 }} >
                 {
                     data &&
-                    data
+                    (data as Exercise[])
                         .map
                         (
                             ex =>
