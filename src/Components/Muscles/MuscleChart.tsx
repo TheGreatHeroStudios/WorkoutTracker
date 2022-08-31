@@ -241,7 +241,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                     height={chartHeight} />
             </div> :
             <div style={{display: "flex", flexDirection: "column"}}>
-                <Typography variant="overline" align="left" sx={{marginTop: "20px"}}>
+                <Typography width={chartWidth} variant="overline" align="left" sx={{marginTop: "20px"}}>
                     Muscle Group(s)
                 </Typography>
                 <div 
@@ -273,7 +273,7 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                         }
                         </div>
                 </div>
-                <Typography variant="body1">
+                <Typography width={chartWidth} variant="body1">
                     {
                         focusedMuscle !== undefined && focusedMuscle !== null ?
                             `${focusedMuscle.anatomicalName} (${focusedMuscle.simpleName})` :
