@@ -1,9 +1,9 @@
 import { AddAPhoto } from "@mui/icons-material";
-import { IconButton, Skeleton, TextField } from "@mui/material";
-import React, { useState } from "react";
+import { CircularProgress, IconButton, Skeleton, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import MuscleChart from "../Muscles/MuscleChart";
 import { Muscle } from "../../DataModel/Muscles";
-import { ImagePicker } from "react-file-picker";
+import { useFilePicker } from "use-file-picker";
 import { Exercise } from "../../DataModel/Exercises";
 import { RequestState, useGetRequest } from "../../Utility/RestClient";
 
@@ -22,7 +22,7 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
 
     const [exerciseImageBase64, SetExerciseImageBase64] = useState<string>(null);
 
-    const { dataLoading } =
+    const { dataLoading: imageLoadingFromDatabase } =
         useGetRequest<string>
         (
             {
@@ -47,13 +47,35 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                         //If the response was anything but '200', do nothing
                         if(response.status === 200)
                         {
-                            requestState.data = "";
+                            //requestState.data = response.;
                         }
 
                         return requestState;
                     }
             }
         );
+
+    const [openFileSelector, { filesContent, loading: imageLoadingFromFilePicker }] =
+        useFilePicker
+        (
+            {
+                readAs: "DataURL",
+                accept: "image/*",
+                multiple: false
+            }
+        );
+
+    useEffect
+    (
+        () =>
+        {
+            if(filesContent.length && filesContent.length > 0)
+            {
+                SetExerciseImageBase64(filesContent[0].content);
+            }
+        },
+        [filesContent]
+    );
 
     return (
         <div 
@@ -76,37 +98,25 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                     }
                     sx={{paddingTop: "10px"}} />
                 {
-                    dataLoading ?
-                        <Skeleton 
-                            variant="rectangular" 
-                            animation="pulse"
-                            width="120px"
-                            height="120px" /> :
-                        <ImagePicker 
-                            extensions={['jpg', 'jpeg', 'png']}
-                            dims=
-                            {{
-                                minWidth: 100,
-                                maxWidth: 500,
-                                minHeight: 100,
-                                maxHeigth: 500
-                            }}
-                            onChange=
-                            {
-                                base64 => SetExerciseImageBase64(base64)
-                            } >
-                            <IconButton>
-                                <AddAPhoto
-                                    sx=
-                                    {{
-                                        alignSelf: "center", 
-                                        marginLeft: "10px", 
-                                        fontSize: "40px",
-                                        color: "#CCCCCC",
-                                        width: "20vw"
-                                    }} />
-                            </IconButton>
-                        </ImagePicker>
+                    imageLoadingFromDatabase || imageLoadingFromFilePicker ?
+                        <CircularProgress color="primary" size="5vw" sx={{margin: "auto"}} />  :
+                    exerciseImageBase64 === null ?
+                        <IconButton onClick={() => openFileSelector()}>
+                            <AddAPhoto
+                                sx=
+                                {{
+                                    alignSelf: "center", 
+                                    marginLeft: "10px", 
+                                    fontSize: "40px",
+                                    color: "#CCCCCC",
+                                    width: "20vw"
+                                }} />
+                        </IconButton> :
+                    <img alt="Exercise Thumbnail"
+                        src={exerciseImageBase64} 
+                        width="100px"
+                        height="100px"
+                        onClick={() => openFileSelector()} />
                 }
             </div>
             <MuscleChart 
