@@ -2,6 +2,7 @@ import { CircularProgress, Container } from "@mui/material";
 import React from "react";
 import ExerciseCard from "../../Components/Exercises/ExerciseCard";
 import { Exercise } from "../../DataModel/Exercises";
+import { ApplyBase64Formatting } from "../../Utility/ImageCropper";
 import { useGetRequest } from "../../Utility/RestClient";
 
 interface ExerciseListProps
@@ -20,7 +21,7 @@ const ExerciseList = ({onEditExercise}: ExerciseListProps) =>
                     [
                         {paramName: "pageIndex", paramValue: "0"},
                         {paramName: "count", paramValue: "10"}
-                    ]
+                    ],
             }
         );
 
@@ -41,18 +42,31 @@ const ExerciseList = ({onEditExercise}: ExerciseListProps) =>
                         .map
                         (
                             ex =>
-                            (
-                                <ExerciseCard 
-                                    key={ex.exerciseId}
-                                    exercise={ex}
-                                    onEditExercise={onEditExercise}
-                                    sx=
-                                    {{
-                                        maxWidth: "90vw",
-                                        height: "12vh",
-                                        marginTop: "20px"
-                                    }} />
-                            )
+                            {
+                                ex.exerciseImageBase64 =
+                                    ex.exerciseImageBase64 && 
+                                    ex.exerciseImageBase64.length > 0 ?
+                                        ApplyBase64Formatting
+                                        (
+                                            ex.exerciseImageBase64,
+                                            "png"
+                                        ) :
+                                        null;
+
+                                return (
+                                    <ExerciseCard 
+                                        key={ex.exerciseId}
+                                        exercise={ex}
+                                        onEditExercise={onEditExercise}
+                                        sx=
+                                        {{
+                                            maxWidth: "90vw",
+                                            height: "12vh",
+                                            marginTop: "20px",
+                                            padding: "10px"
+                                        }} />
+                                );
+                            }
                         )   
                 }
             </Container>

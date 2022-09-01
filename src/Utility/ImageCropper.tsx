@@ -4,6 +4,20 @@ import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from "react-im
 import "react-image-crop/dist/ReactCrop.css";
 import { CanvasCropPreview } from "./CanvasCropPreview";
 
+export const ApplyBase64Formatting =
+    (base64Src: string, format: "png" | "jpg" | "jpeg" | "gif") =>
+        `data:image/${format};base64,${base64Src}`;
+
+export const StripBase64Formatting =
+        (formattedBase64: string) =>
+            formattedBase64.startsWith("data:image/") ?
+                formattedBase64
+                    .substring
+                    (
+                        formattedBase64.indexOf(",") + 1
+                    ) :
+                formattedBase64;
+
 interface ImageCropperProps
 {
     uncroppedImgSrc: string;

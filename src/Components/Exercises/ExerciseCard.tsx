@@ -2,7 +2,6 @@ import { Edit, PhotoCamera } from "@mui/icons-material";
 import { Box, CardContent, CardMedia, IconButton, SxProps, Theme, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Exercise } from "../../DataModel/Exercises";
 
 
@@ -15,8 +14,6 @@ export interface ExerciseCardProps
 
 const ExerciseCard = (props: ExerciseCardProps) =>
 {
-    const navigate = useNavigate();
-
     const GetMuscleGroupIconPaths = () =>
     {
         return (
@@ -55,15 +52,26 @@ const ExerciseCard = (props: ExerciseCardProps) =>
                 flexDirection: "row",
                 ...props.sx
             }} >
-            <PhotoCamera 
-                sx=
-                {{
-                    alignSelf: "center", 
-                    marginLeft: "10px", 
-                    fontSize: "60px",
-                    color: "#CCCCCC",
-                    width: "20vw"
-                }} />
+            {
+                props.exercise?.exerciseImageBase64 ?
+                    <img alt="Exercise Thumbnail"
+                        src={props.exercise.exerciseImageBase64}
+                        width="80px"
+                        height="80px"
+                        style=
+                        {{
+                            margin: "auto"
+                        }} /> :
+                    <PhotoCamera 
+                        sx=
+                        {{
+                            alignSelf: "center", 
+                            marginLeft: "10px", 
+                            fontSize: "60px",
+                            color: "#CCCCCC",
+                            width: "20vw"
+                        }} />
+            }
             <CardContent 
                 sx=
                 {{

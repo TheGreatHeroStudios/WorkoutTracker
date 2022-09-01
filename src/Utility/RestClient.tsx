@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getReasonPhrase } from "http-status-codes";
 
+
 export interface RequestState<TResult>
 {
     dataLoading: boolean;
@@ -8,14 +9,124 @@ export interface RequestState<TResult>
     error: string;
 }
 
+
 interface RestRequestProps<TResult>
 {
     resourcePath: string;
     queryParams?: {paramName: string, paramValue: string}[];
+    requestBody?: any;
     responseHandler?: (response: Response) => RequestState<TResult>
     onComplete?: (queryResults: any) => void;
     onError?: (error: string) => void;
 }
+
+
+function FormatQueryString
+(
+    queryParams?: {paramName: string, paramValue: string}[]
+)
+{
+    let queryString = "";
+
+    if(queryParams && queryParams.length > 0)
+    {
+        queryString += "?";
+        queryParams
+            .forEach
+            (
+                param =>
+                    queryString += 
+                        `${param.paramName}=${param.paramValue}&`
+            );
+        queryString =
+            queryString.substring(0, queryString.length - 1);
+    }
+
+    return queryString;
+}
+
+
+export function executePutRequest
+(
+    {
+        resourcePath, 
+        queryParams,
+        requestBody, 
+        onComplete, 
+        onError
+    }: RestRequestProps<any>
+)
+{
+    const queryString = FormatQueryString(queryParams);
+
+    fetch
+    (
+        `${resourcePath}${queryString}`,
+        {
+            method: 'PUT',
+            body: JSON.stringify(requestBody),
+            headers: 
+            {
+                'Content-Type': 'application/json'
+            }
+        }
+    )
+    .then
+    (
+        response =>
+        {
+            if(response.status >= 400)
+            {
+                //If the response status was in the error range (4xx or 5xx)
+                //set the error based on the response code received.
+                const errorMessage =
+                    `PUT request failed with status code '${response.status}' (${getReasonPhrase(response.status)})`;
+                
+                if
+                (
+                    onError !== undefined && 
+                    onError !== null
+                )
+                {
+                    onError(errorMessage);
+                }
+            }
+            else
+            {
+                //If the response was successful, (and no custom handler was provided) 
+                //convert the response to json, and use it to set the 'data' state.
+                response
+                    .json()
+                    .then
+                    (
+                        queryResults => 
+                        {
+                            if
+                            (
+                                onComplete !== undefined && 
+                                onComplete !== null
+                            )
+                            {
+                                onComplete(queryResults);
+                            }
+                        },
+                        rejectReason =>
+                        {
+                            if
+                            (
+                                onError !== undefined && 
+                                onError !== null
+                            )
+                            {
+                                onError(JSON.stringify(rejectReason));
+                            }
+                        }
+                    )
+            }
+        }
+    );
+}
+
 
 export function useGetRequest<TResult>
 (
@@ -35,24 +146,18 @@ export function useGetRequest<TResult>
     const InvokeRequest =
         () =>
         {
-            let queryString = "";
-            if(queryParams && queryParams.length > 0)
-            {
-                queryString += "?";
-                queryParams
-                    .forEach
-                    (
-                        param =>
-                            queryString += 
-                                `${param.paramName}=${param.paramValue}&`
-                    );
-                queryString =
-                    queryString.substring(0, queryString.length - 1);
-            }
+            const queryString = FormatQueryString(queryParams);
             
             fetch
             (
-                `${resourcePath}${queryString}`
+                `${resourcePath}${queryString}`,
+                {
+                    method: 'GET',
+                    headers: 
+                    {
+                        'Content-Type': 'application/json'
+                    }
+                }
             )
             .then
             (
@@ -74,7 +179,20 @@ export function useGetRequest<TResult>
                         {
                             //If the response status was in the error range (4xx or 5xx)
                             //set the error based on the response code received.
-                            SetError(`Fetch failed with status code '${response.status}' (${getReasonPhrase(response.status)})`)
+                            const errorMessage =
+                                `GET request failed with status code '${response.status}' (${getReasonPhrase(response.status)})`;
+                            
+                            SetError(errorMessage);
+                            
+                            if
+                            (
+                                onError !== undefined && 
+                                onError !== null
+                            )
+                            {
+                                onError(errorMessage);
+                            }
+
                             SetDataLoading(false);
                         }
                         else

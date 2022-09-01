@@ -1,12 +1,12 @@
 import { AddAPhoto } from "@mui/icons-material";
-import { CircularProgress, Dialog, IconButton, TextField } from "@mui/material";
+import { Button, CircularProgress, Dialog, IconButton, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import MuscleChart from "../Muscles/MuscleChart";
 import { Muscle } from "../../DataModel/Muscles";
 import { useFilePicker } from "use-file-picker";
 import { Exercise } from "../../DataModel/Exercises";
-import { RequestState, useGetRequest } from "../../Utility/RestClient";
-import ImageCropper from "../../Utility/ImageCropper";
+import { executePutRequest, RequestState, useGetRequest } from "../../Utility/RestClient";
+import ImageCropper, { StripBase64Formatting } from "../../Utility/ImageCropper";
 
 interface EditExerciseFormProps
 {
@@ -21,42 +21,14 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
     const [exerciseMuscles, SetExerciseMuscles] = 
         useState<Muscle[]>(props.exerciseInContext.muscles);
 
-    const [exerciseImageBase64, SetExerciseImageBase64] = useState<string>(null);
+    const [exerciseImageBase64, SetExerciseImageBase64] = 
+        useState<string>(props.exerciseInContext.exerciseImageBase64);
 
-    const [croppedExerciseImageBase64, SetCroppedExerciseImageBase64] = useState<string>(null);
+    const [croppedExerciseImageBase64, SetCroppedExerciseImageBase64] = 
+        useState<string>(props.exerciseInContext.exerciseImageBase64);
 
-    const { dataLoading: imageLoadingFromDatabase } =
-        useGetRequest<string>
-        (
-            {
-                resourcePath: "/exercise/image",
-                queryParams: 
-                [
-                    {
-                        paramName: "exerciseId", 
-                        paramValue: `${props.exerciseInContext.exerciseId}`
-                    }
-                ],
-                responseHandler:
-                    (response) =>
-                    {
-                        const requestState: RequestState<string> =
-                        {
-                            dataLoading: false,
-                            data: "",
-                            error: ""
-                        };
-
-                        //If the response was anything but '200', do nothing
-                        if(response.status === 200)
-                        {
-                            //requestState.data = response.;
-                        }
-
-                        return requestState;
-                    }
-            }
-        );
+    const [exerciseDescription, SetExerciseDescription] =
+        useState<string>(props.exerciseInContext.exerciseDescription);
 
     const [openFileSelector, { filesContent, loading: imageLoadingFromFilePicker }] =
         useFilePicker
@@ -81,6 +53,27 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
         [filesContent]
     );
 
+    const FormatPutBody = 
+        () =>
+        (
+            {
+                exerciseId: props.exerciseInContext.exerciseId,
+                exerciseName: exerciseName,
+                exerciseDescription: exerciseDescription,
+                exerciseImageBase64: 
+                    croppedExerciseImageBase64 ? 
+                        StripBase64Formatting(croppedExerciseImageBase64) :
+                        null,
+                muscleIds:
+                    exerciseMuscles
+                        .map
+                        (
+                            muscle =>
+                                muscle.muscleId
+                        )
+            }
+        );
+        
     return (
         <div>
             <Dialog 
@@ -127,7 +120,7 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                         }
                         sx={{paddingTop: "10px"}} />
                     {
-                        imageLoadingFromDatabase || imageLoadingFromFilePicker ?
+                        imageLoadingFromFilePicker ?
                             <CircularProgress color="primary" size="5vw" sx={{margin: "auto"}} />  :
                         croppedExerciseImageBase64 === null ?
                             <IconButton onClick={() => openFileSelector()}>
@@ -152,6 +145,31 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                 <MuscleChart 
                     selectedMuscles={exerciseMuscles}
                     SelectedMusclesChanged={SetExerciseMuscles} />
+                <TextField
+                    id="outlined-multiline-static"
+                    label="Exercise Description"
+                    multiline
+                    rows="3"
+                    value={exerciseDescription ?? ""}
+                    onChange=
+                    {
+                        (e) => SetExerciseDescription(e.target.value)
+                    }
+                    sx={{marginTop: "10px"}} />
+                <Button 
+                    onClick=
+                    {
+                        () =>
+                            executePutRequest
+                            (
+                                {
+                                    resourcePath: "/exercise",
+                                    requestBody: FormatPutBody()
+                                }
+                            )
+                    } >
+                    Save
+                </Button>
             </div>
         </div>
     );

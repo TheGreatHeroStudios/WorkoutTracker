@@ -241,7 +241,11 @@ const MuscleChart = ({chartWidth, chartHeight, selectedMuscles, SelectedMusclesC
                     height={chartHeight} />
             </div> :
             <div style={{display: "flex", flexDirection: "column"}}>
-                <Typography width={chartWidth} variant="overline" align="left" sx={{marginTop: "20px"}}>
+                <Typography 
+                    width={chartWidth} 
+                    variant="overline" 
+                    align="left" 
+                    sx={{marginTop: "10px"}} >
                     Muscle Group(s)
                 </Typography>
                 <div 
