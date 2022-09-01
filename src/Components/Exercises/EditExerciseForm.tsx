@@ -1,5 +1,5 @@
 import { AddAPhoto } from "@mui/icons-material";
-import { CircularProgress, Dialog, IconButton, Skeleton, TextField } from "@mui/material";
+import { CircularProgress, Dialog, IconButton, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import MuscleChart from "../Muscles/MuscleChart";
 import { Muscle } from "../../DataModel/Muscles";
@@ -75,6 +75,7 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
             if(filesContent.length && filesContent.length > 0)
             {
                 SetExerciseImageBase64(filesContent[0].content);
+                SetCroppedExerciseImageBase64(null);
             }
         },
         [filesContent]
@@ -114,7 +115,7 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                     paddingLeft: "20px",
                     paddingTop: "20px"
                 }}>
-                <div style={{display: "flex", flexDirection: "row"}}>
+                <div style={{display: "flex", flexDirection: "row", alignItems: "flex-end"}}>
                     <TextField
                         required
                         id="outlined-required"
@@ -134,7 +135,7 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                                     sx=
                                     {{
                                         alignSelf: "center", 
-                                        marginLeft: "10px", 
+                                        marginLeft: "5px", 
                                         fontSize: "40px",
                                         color: "#CCCCCC",
                                         width: "20vw"
@@ -142,8 +143,9 @@ const EditExerciseForm = (props: EditExerciseFormProps) =>
                             </IconButton> :
                         <img alt="Exercise Thumbnail"
                             src={croppedExerciseImageBase64} 
-                            width="100px"
-                            height="100px"
+                            width="80px"
+                            height="80px"
+                            style={{marginLeft: "15px"}}
                             onClick={() => openFileSelector()} />
                     }
                 </div>

@@ -1,8 +1,8 @@
 import { Button, Typography } from "@mui/material";
-import { maxWidth } from "@mui/system";
 import { useRef, useState } from "react";
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { CanvasCropPreview } from "./CanvasCropPreview";
 
 interface ImageCropperProps
 {
@@ -12,7 +12,7 @@ interface ImageCropperProps
 
 const ImageCropper = ({uncroppedImgSrc, onImageCropped}: ImageCropperProps) =>
 {
-    const uncroppedImage = useRef<HTMLImageElement>();
+    const uncroppedImgRef = useRef<HTMLImageElement>();
     
     const [currentCrop, SetCurrentCrop] = 
         useState<Crop>
@@ -56,21 +56,16 @@ const ImageCropper = ({uncroppedImgSrc, onImageCropped}: ImageCropperProps) =>
         {
             let croppedImgSrc = uncroppedImgSrc;
 
-            if(uncroppedImage?.current && completedCrop)
+            if(uncroppedImgRef?.current && completedCrop)
             {
                 const canvas = document.createElement("canvas");
-                canvas.width = completedCrop.width;
-                canvas.height = completedCrop.height;
-                canvas
-                    .getContext("2d")
-                    .drawImage
-                    (
-                        uncroppedImage.current, 
-                        0, 
-                        0, 
-                        completedCrop.width, 
-                        completedCrop.height
-                    );
+                
+                CanvasCropPreview
+                (
+                    uncroppedImgRef.current,
+                    canvas,
+                    completedCrop
+                );
 
                 croppedImgSrc = canvas.toDataURL();
             }
@@ -106,7 +101,7 @@ const ImageCropper = ({uncroppedImgSrc, onImageCropped}: ImageCropperProps) =>
                 maxHeight={500}
                 keepSelection={true} >
                 <img 
-                    ref={uncroppedImage}
+                    ref={uncroppedImgRef}
                     alt="Exercise Thumbnail" 
                     src={uncroppedImgSrc} 
                     onLoad=
