@@ -1,4 +1,11 @@
+import { AppShellAction } from "../Layout/AppShell";
+
 export interface WorkoutTrackerPageProps
 {
-    onPageTitleOverridden: (overriddenPageTitle: string) => void;
+    SetPageTitle: (overriddenPageTitle: string) => void;
+    appShellActionState:
+    [
+        appShellActions: Map<AppShellAction, () => void>,
+        SetAppShellActions: (actions: Map<AppShellAction, () => void>) => void
+    ]
 }

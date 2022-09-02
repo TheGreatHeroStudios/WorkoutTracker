@@ -2,19 +2,23 @@ import './App.css';
 import React, { ReactNode, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
-import AppShell from './Layout/AppShell';
+import AppShell, { AppShellAction } from './Layout/AppShell';
 import WorkoutsPage from './Pages/Workouts/WorkoutsPage';
 import ExercisesPage from './Pages/Exercises/ExercisesPage';
 
 const App = 
   () =>
   {
-    const [pageTitleOverride, SetPageTitleOverride] = useState<String>(null);
+    const [pageTitleOverride, SetPageTitle] = useState<String>(null);
+    
+    const [appShellActions, SetAppShellActions] = 
+      useState<Map<AppShellAction, () => void>>(null);
 
     const HandleNavigate =
       (prevRoute: string, prevPage: ReactNode) =>
       {
-        SetPageTitleOverride(null);
+        SetPageTitle(null);
+        SetAppShellActions(null);
       }
 
     return (
@@ -46,13 +50,11 @@ const App =
                   <AppShell 
                     pageTitle={pageTitleOverride ?? "Exercises"} 
                     pageIndex={2}
-                    onNavigate={HandleNavigate} >
+                    onNavigate={HandleNavigate}
+                    actions={appShellActions} >
                     <ExercisesPage 
-                      onPageTitleOverridden=
-                      {
-                        (overriddenPageTitle) => 
-                          SetPageTitleOverride(overriddenPageTitle)
-                      } />
+                      SetPageTitle={SetPageTitle}
+                      appShellActionState={[appShellActions, SetAppShellActions]} />
                   </AppShell>
                 } >
               </Route>

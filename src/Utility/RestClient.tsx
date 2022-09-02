@@ -93,35 +93,14 @@ export function executePutRequest
             }
             else
             {
-                //If the response was successful, (and no custom handler was provided) 
-                //convert the response to json, and use it to set the 'data' state.
-                response
-                    .json()
-                    .then
-                    (
-                        queryResults => 
-                        {
-                            if
-                            (
-                                onComplete !== undefined && 
-                                onComplete !== null
-                            )
-                            {
-                                onComplete(queryResults);
-                            }
-                        },
-                        rejectReason =>
-                        {
-                            if
-                            (
-                                onError !== undefined && 
-                                onError !== null
-                            )
-                            {
-                                onError(JSON.stringify(rejectReason));
-                            }
-                        }
-                    )
+                if
+                (
+                    onComplete !== undefined && 
+                    onComplete !== null
+                )
+                {
+                    onComplete(null);
+                }
             }
         }
     );

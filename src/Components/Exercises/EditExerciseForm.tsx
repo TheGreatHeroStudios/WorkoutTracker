@@ -8,10 +8,15 @@ import { Exercise } from "../../DataModel/Exercises";
 import { executePutRequest, RequestState, useGetRequest } from "../../Utility/RestClient";
 import ImageCropper, { StripBase64Formatting } from "../../Utility/ImageCropper";
 import { WorkoutTrackerPageProps } from "../../Pages/WorkoutTrackerPageProps";
+import { AppShellAction } from "../../Layout/AppShell";
 
 interface EditExerciseFormProps
 {
-    exerciseInContext: Exercise;
+    exerciseInContextState:
+        [
+            exerciseInContext: Exercise, 
+            SetExerciseInContext: (exerciseInContext: Exercise) => void
+        ]
 }
 
 const EditExerciseForm = 
@@ -19,28 +24,31 @@ const EditExerciseForm =
     props: EditExerciseFormProps & WorkoutTrackerPageProps
 ) =>
 {
+    const [appShellActions, SetAppShellActions] = props.appShellActionState;
+    const [exerciseInContext, SetExerciseInContext] = props.exerciseInContextState;
+
     props
-        .onPageTitleOverridden
+        .SetPageTitle
         (
-            props.exerciseInContext.exerciseId === -1 ? 
+            exerciseInContext.exerciseId === -1 ? 
                 "New Exercise" : 
                 "Edit Exercise"
         );
 
     const [exerciseName, SetExerciseName] = 
-        useState(props.exerciseInContext.exerciseName);
+        useState(exerciseInContext.exerciseName);
 
     const [exerciseMuscles, SetExerciseMuscles] = 
-        useState<Muscle[]>(props.exerciseInContext.muscles);
+        useState<Muscle[]>(exerciseInContext.muscles);
 
     const [exerciseImageBase64, SetExerciseImageBase64] = 
-        useState<string>(props.exerciseInContext.exerciseImageBase64);
+        useState<string>(exerciseInContext.exerciseImageBase64);
 
     const [croppedExerciseImageBase64, SetCroppedExerciseImageBase64] = 
-        useState<string>(props.exerciseInContext.exerciseImageBase64);
+        useState<string>(exerciseInContext.exerciseImageBase64);
 
     const [exerciseDescription, SetExerciseDescription] =
-        useState<string>(props.exerciseInContext.exerciseDescription);
+        useState<string>(exerciseInContext.exerciseDescription);
 
     const [openFileSelector, { filesContent, loading: imageLoadingFromFilePicker }] =
         useFilePicker
@@ -69,7 +77,7 @@ const EditExerciseForm =
         () =>
         (
             {
-                exerciseId: props.exerciseInContext.exerciseId,
+                exerciseId: exerciseInContext.exerciseId,
                 exerciseName: exerciseName,
                 exerciseDescription: exerciseDescription,
                 exerciseImageBase64: 
@@ -85,7 +93,38 @@ const EditExerciseForm =
                         )
             }
         );
-        
+
+    useEffect
+    (
+        () =>
+            SetAppShellActions
+            (
+                new Map<AppShellAction, () => void>
+                (
+                    [
+                        [
+                            "Save", 
+                            () =>
+                                executePutRequest
+                                (
+                                    {
+                                        resourcePath: "/exercise",
+                                        requestBody: FormatPutBody(),
+                                        onComplete: (queryResults) => 
+                                            {
+                                                SetExerciseInContext(null);
+                                                SetAppShellActions(null);
+                                                props.SetPageTitle(null);
+                                            }
+                                    }
+                                )
+                        ]
+                    ]
+                )
+            ),
+        [exerciseInContext]
+    )
+
     return (
         <div>
             <Dialog 
@@ -168,20 +207,6 @@ const EditExerciseForm =
                         (e) => SetExerciseDescription(e.target.value)
                     }
                     sx={{marginTop: "10px"}} />
-                <Button 
-                    onClick=
-                    {
-                        () =>
-                            executePutRequest
-                            (
-                                {
-                                    resourcePath: "/exercise",
-                                    requestBody: FormatPutBody()
-                                }
-                            )
-                    } >
-                    Save
-                </Button>
             </div>
         </div>
     );

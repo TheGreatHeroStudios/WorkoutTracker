@@ -1,24 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExerciseList from "../../Components/Exercises/ExerciseList";
 import { Exercise } from "../../DataModel/Exercises";
 import EditExerciseForm from "../../Components/Exercises/EditExerciseForm";
 import { WorkoutTrackerPageProps } from "../WorkoutTrackerPageProps";
+import { AppShellAction } from "../../Layout/AppShell";
 
-const ExercisesPage = ({ onPageTitleOverridden }: WorkoutTrackerPageProps) =>
-{
-    const [exerciseInContext, SetExerciseInContext] = useState<Exercise>(null);
+const ExercisesPage = 
+    (
+        { SetPageTitle, appShellActionState }: WorkoutTrackerPageProps
+    ) =>
+    {
+        const [appShellActions, SetAppShellActions] = appShellActionState;
+        const [exerciseInContext, SetExerciseInContext] = useState<Exercise>(null);
 
-    return (
-        exerciseInContext === null ?
-            <ExerciseList 
-                onEditExercise=
+        useEffect
+        (
+            () =>
+            {
+                if(!exerciseInContext)
                 {
-                    (exercise) => SetExerciseInContext(exercise)
-                }/> :
-            <EditExerciseForm 
-                exerciseInContext={exerciseInContext}
-                onPageTitleOverridden={onPageTitleOverridden}/>
-    );
-}
+                    SetAppShellActions
+                    (
+                        new Map<AppShellAction, () => void>
+                        (
+                            [
+                                [
+                                    "Add", 
+                                    () => 
+                                    {
+                                        SetExerciseInContext
+                                        (
+                                            {
+                                                exerciseId: -1,
+                                                exerciseName: "New Exercise",
+                                                exerciseDescription: null,
+                                                exerciseImageBase64: null,
+                                                muscles: []
+                                            }
+                                        )
+                                    }
+                                ]
+                            ]
+                        )
+                    )
+                }
+            },
+            [exerciseInContext]
+        )
+
+        return (
+            exerciseInContext === null ?
+                <ExerciseList 
+                    onEditExercise=
+                    {
+                        (exercise) => SetExerciseInContext(exercise)
+                    }/> :
+                <EditExerciseForm 
+                    exerciseInContextState={[exerciseInContext, SetExerciseInContext]}
+                    SetPageTitle={SetPageTitle}
+                    appShellActionState={appShellActionState}/>
+        );
+    }
 
 export default ExercisesPage;
