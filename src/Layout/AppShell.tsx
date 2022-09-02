@@ -8,11 +8,20 @@ import { useState } from "react";
 export interface AppShellProps
 {
     children: ReactNode;
-    pageTitle: string;
+    pageTitle: String;
     pageIndex: number;
+    onNavigate?: (prevRoute: string, prevPage: ReactNode) => void;
 }
 
-const AppShell = (props) =>
+const routeDirectory =
+    [
+        "../profile",
+        "../workouts",
+        "../exercises",
+        "../weigh-in"
+    ];
+
+const AppShell = (props: AppShellProps) =>
 {
     const navigate = useNavigate();
     const [currentPageIndex, setCurrentPageIndex] = useState(props.pageIndex);
@@ -40,28 +49,16 @@ const AppShell = (props) =>
                 {
                     (event, value) =>
                     {
-                        switch(value)
+                        navigate(routeDirectory[value] ?? routeDirectory[0]);
+
+                        if(props.onNavigate !== null && props.onNavigate !== undefined)
                         {
-                            case 0:
-                            {
-                                navigate("../profile");
-                                break;
-                            }
-                            case 1:
-                            {
-                                navigate("../workouts");
-                                break;
-                            }
-                            case 2:
-                            {
-                                navigate("../exercises");
-                                break;
-                            }
-                            case 3:
-                            {
-                                navigate("../weigh-in");
-                                break;
-                            }
+                            props
+                                .onNavigate
+                                (
+                                    routeDirectory[currentPageIndex] ?? routeDirectory[0], 
+                                    props.children
+                                );
                         }
 
                         setCurrentPageIndex(value);

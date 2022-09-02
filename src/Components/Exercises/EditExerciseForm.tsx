@@ -7,14 +7,26 @@ import { useFilePicker } from "use-file-picker";
 import { Exercise } from "../../DataModel/Exercises";
 import { executePutRequest, RequestState, useGetRequest } from "../../Utility/RestClient";
 import ImageCropper, { StripBase64Formatting } from "../../Utility/ImageCropper";
+import { WorkoutTrackerPageProps } from "../../Pages/WorkoutTrackerPageProps";
 
 interface EditExerciseFormProps
 {
     exerciseInContext: Exercise;
 }
 
-const EditExerciseForm = (props: EditExerciseFormProps) =>
+const EditExerciseForm = 
+(
+    props: EditExerciseFormProps & WorkoutTrackerPageProps
+) =>
 {
+    props
+        .onPageTitleOverridden
+        (
+            props.exerciseInContext.exerciseId === -1 ? 
+                "New Exercise" : 
+                "Edit Exercise"
+        );
+
     const [exerciseName, SetExerciseName] = 
         useState(props.exerciseInContext.exerciseName);
 
