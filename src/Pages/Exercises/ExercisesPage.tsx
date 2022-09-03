@@ -44,7 +44,8 @@ const ExercisesPage =
                         )
                     )
                 }
-            }
+            },
+            [exerciseInContext]
         )
 
         return (

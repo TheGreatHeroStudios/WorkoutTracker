@@ -121,7 +121,8 @@ const EditExerciseForm =
                         ]
                     ]
                 )
-            )
+            ),
+        [FormatPutBody]
     )
 
     return (
